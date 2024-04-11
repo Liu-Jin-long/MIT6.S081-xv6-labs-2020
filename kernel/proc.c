@@ -282,7 +282,8 @@ fork(void)
 
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
-
+  // trace掩码
+  np->trace_mask=p->trace_mask;
   // increment reference counts on open file descriptors.
   for(i = 0; i < NOFILE; i++)
     if(p->ofile[i])
@@ -692,4 +693,19 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+uint get_proc_number(void)
+{
+    struct proc* p;
+    uint proc_number=0;
+    for(p=proc;p<&proc[NPROC];p++)
+    {
+      if(p->state!=UNUSED)
+      {
+        proc_number++;
+      }
+    }
+    return proc_number;
+    
 }
