@@ -68,6 +68,28 @@ int
 argaddr(int n, uint64 *ip)
 {
   *ip = argraw(n);
+  // 当前处于内核，用户虚拟地址会手动转换walkaddr不成功返回-1
+  struct proc* p=myproc();
+  if(walkaddr(p->pagetable,*ip)==0)
+  {
+    if(*ip>=PGROUNDUP(p->trapframe->sp)&&*ip<p->sz)
+    {
+      uint64* pa;
+      if((pa=kalloc())==0)
+      {
+        return -1;
+      }
+      memset(pa,0,PGSIZE);
+      if(mappages(p->pagetable,PGROUNDDOWN(*ip),PGSIZE,(uint64)pa,PTE_R | PTE_W | PTE_X | PTE_U)!=0)
+      {
+        kfree(pa);
+        return -1;
+      }
+    }else{
+      return -1;
+    }
+  }
+  
   return 0;
 }
 
