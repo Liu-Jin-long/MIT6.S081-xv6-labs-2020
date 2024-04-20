@@ -63,6 +63,9 @@ void            ramdiskrw(struct buf*);
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
+int page_ref_increase(uint64 pa);
+int is_cow_page(pagetable_t pagetable, uint64 va);
+uint64 cow_alloc(pagetable_t pagetable, uint64 va);
 
 // log.c
 void            initlog(int, struct superblock*);
@@ -171,6 +174,8 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
+pte_t *walk(pagetable_t pagetable, uint64 va, int alloc);
+void vmprint(pagetable_t pagetable);
 
 // plic.c
 void            plicinit(void);
