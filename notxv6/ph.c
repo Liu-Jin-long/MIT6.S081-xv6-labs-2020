@@ -42,7 +42,7 @@ static void put(int key, int value)
 
   // is the key already present?
   struct entry *e = 0;
-  pthread_mutex_lock(&mutex[i]);
+
   for (e = table[i]; e != 0; e = e->next)
   {
     if (e->key == key)
@@ -56,9 +56,10 @@ static void put(int key, int value)
   else
   {
     // the new is new.
+    pthread_mutex_lock(&mutex[i]);
     insert(key, value, &table[i], table[i]);
+    pthread_mutex_unlock(&mutex[i]);
   }
-  pthread_mutex_unlock(&mutex[i]);
 }
 
 static struct entry *
@@ -67,13 +68,11 @@ get(int key)
   int i = key % NBUCKET;
 
   struct entry *e = 0;
-  pthread_mutex_lock(&mutex[i]);
   for (e = table[i]; e != 0; e = e->next)
   {
     if (e->key == key)
       break;
   }
-  pthread_mutex_unlock(&mutex[i]);
   return e;
 }
 
